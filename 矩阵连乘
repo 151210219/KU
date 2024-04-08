@@ -1,0 +1,79 @@
+#include <iostream>
+using namespace std;
+void MatrixChain(int *p,int n,int **m,int **s){
+    for(int i=1;i<=n;i++)
+    {
+        m[i][i]=0;
+    }
+    for(int r=2;r<=n;r++)
+    {
+        for(int i=1;i<=n-r+1;i++)
+        {
+            int j=i+r-1;
+            m[i][j]=m[i+1][j]+p[i-1]*p[i]*p[j];
+            s[i][j]=i;
+            for(int k=i+1;k<j;k++)
+            {
+                int t=m[i][k]+m[k+1][j]+p[i-1]*p[k]*p[j];
+                if(t<m[i][j])
+                {
+                    m[i][j]=t;
+                    s[i][j]=k;
+                }
+            }
+        }
+    }
+}
+void Traceback(int i,int j,int **s)//求A[i:j]的最优解构造，利用s[][]，设已知s[i][j]=k
+{
+    int t=0;
+	if(i==j)
+		return ;//A[i:i]不必构造，递归出口
+
+	Traceback(i,s[i][j],s);//求A[i:k]的构造，记1
+	
+    //Traceback(s[i][j]+1,j,s);//求A[k+1:j]的构造，记2
+    
+    cout<<t++<<endl;
+	cout<<"Multiply A "<<i<<","<<s[i][j];
+	cout<<" and A "<<(s[i][j]+1)<<","<<j<<endl;//输出Ai,k And Ak+1,j，表明在k处断开，记3
+
+    
+}
+int main()
+{
+    int p[15]={30,35,15,5,10,20,25};
+
+    int n;
+    cout<<"请输入矩阵个数:"<<endl;
+    cin>>n;
+    int** m = new int* [n+1];
+    int** s = new int* [n+1];
+    for(int i=1;i<=n;i++)
+    {
+       m[i] = new int [n+1];
+       s[i] = new int [n+1];
+    }
+		
+    MatrixChain(p,n,m,s);
+    
+    for(int i=1;i<=n;i++)
+    {
+     for(int j=1;j<=n;j++)
+     {
+      cout<<m[i][j]<<" ";
+      
+     }
+     cout<<endl;
+    }
+     
+    Traceback(1,n,s);
+    return 0;
+}
+
+	//开辟内存指向每一行,每一行都是一个一维数组
+	//int** arr = new int* [rows];
+ 
+	//为每一行开辟内存
+	//for (int i = 0; i < rows; i++) {
+	//	arr[i] = new int[cols];
